@@ -1,4 +1,5 @@
 @MeetSpace.Api_HostAddress = https://localhost:8000
+@bookingId = 1
 
 GET {{MeetSpace.Api_HostAddress}}/api/rooms
 Accept: application/json
@@ -6,6 +7,18 @@ Accept: application/json
 ###
 
 GET {{MeetSpace.Api_HostAddress}}/api/bookings
+Accept: application/json
+
+###
+
+# Sätt bookingId till ett ID från GET /api/bookings. Förväntat: 200 OK.
+GET {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
+Accept: application/json
+
+###
+
+# Ett ID som inte finns. Förväntat: 404 Not Found.
+GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
 Accept: application/json
 
 ###
