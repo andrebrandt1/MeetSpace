@@ -1,6 +1,37 @@
-@MeetSpace.Api_HostAddress = http://localhost:8000
+@MeetSpace.Api_HostAddress = https://localhost:8000
 
 GET {{MeetSpace.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+### Skapa ett mötesrum
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Konferensrum Himlen",
+  "description": "Stort konferensrum med utsikt över ett molntäckt landskap med harpspelande änglar.",
+  "capacity": 10,
+  "floor": 1000
+}
+
+### Testa flera valideringsfel
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": " A",
+  "description": "Beskrivning med avslutande blanksteg ",
+  "capacity": 501,
+  "floor": 1001
+}
+
+### Skapa ett rum utan beskrivning
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Lilla mötesrummet",
+  "capacity": 4,
+  "floor": 0
+}
