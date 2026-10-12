@@ -1,3 +1,4 @@
+using MeetSpace.Api.Bookings;
 using Microsoft.Data.SqlClient;
 
 namespace MeetSpace.Api.Tests;
@@ -82,6 +83,22 @@ public sealed class SqlServerFixture : IAsyncLifetime
         await connection.OpenAsync();
         await using var command = new SqlCommand("SELECT COUNT(*) FROM dbo.Bookings;", connection);
         return (int)(await command.ExecuteScalarAsync())!;
+    }
+
+    public async Task<Booking?> GetBookingAsync(int id)
+    {
+        await using var connection = new SqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        await using var command = new SqlCommand("""
+            SELECT Id, RoomId, BookedBy, Title, StartTime, EndTime
+            FROM dbo.Bookings WHERE Id = @Id;
+            """, connection);
+        command.Parameters.Add("@Id", System.Data.SqlDbType.Int).Value = id;
+        await using var reader = await command.ExecuteReaderAsync();
+        return await reader.ReadAsync()
+            ? new Booking(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2),
+                reader.GetString(3), reader.GetDateTime(4), reader.GetDateTime(5))
+            : null;
     }
 
     public async ValueTask DisposeAsync()

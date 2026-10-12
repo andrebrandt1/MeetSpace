@@ -8,7 +8,7 @@ public sealed record Booking(
     DateTime StartTime,
     DateTime EndTime);
 
-public sealed record BookingToCreate(
+public sealed record BookingDetails(
     int RoomId,
     string BookedBy,
     string Title,

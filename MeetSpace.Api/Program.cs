@@ -12,6 +12,7 @@ app.UseHttpsRedirection();
 
 app.MapRoomEndpoints();
 app.MapBookingEndpoints();
+app.MapBookingWriteEndpoints();
 
 app.Run();
 
