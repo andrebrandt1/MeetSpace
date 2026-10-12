@@ -69,13 +69,13 @@ public static class RoomEndpoints
 			return Results.Ok(room);
 		});
 
-        app.MapDelete("/api/booking/{id:int}", (int id) =>
+        app.MapDelete("/api/rooms/{id:int}", (int id) =>
         {
             using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
 
             var rows = connection.Execute(
-            "DELETE FROM dbo.Bookings WHERE Id = @Id;",
+            "DELETE FROM dbo.Rooms WHERE Id = @Id;",
             new { Id = id });
 
             return rows == 0 ? Results.NotFound() : Results.NoContent();
