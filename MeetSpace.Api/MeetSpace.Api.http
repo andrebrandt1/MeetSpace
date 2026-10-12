@@ -7,7 +7,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "roomId": 1,
+  "roomId": 2,
   "bookedBy": "John Doe",
   "title": "Veckomöte",
   "startTime": "2026-10-15T09:00:00",
@@ -32,20 +32,19 @@ Accept: application/json
 
 ###
 
-GET {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
+GET {{MeetSpace.Api_HostAddress}}/api/bookings/1
 Accept: application/json
-
 
 
 
 ### Get specific room
 
-GET {{MeetSpace.Api_HostAddress}}/api/rooms/100
+GET {{MeetSpace.Api_HostAddress}}/api/rooms/1
 Accept: application/json
 
 ### Get all bookings
 
-GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
+GET {{MeetSpace.Api_HostAddress}}/api/bookings
 Accept: application/json
 
 
@@ -98,7 +97,7 @@ GET {{MeetSpace.Api_HostAddress}}/api/employees/{{employeeId}}
 Accept: application/json
 
 ### Hämta medarbetare som inte finns: 404
-GET {{MeetSpace.Api_HostAddress}}/api/employees/999999
+GET {{MeetSpace.Api_HostAddress}}/api/employees/1
 Accept: application/json
 
 ### Skapa medarbetare: 201

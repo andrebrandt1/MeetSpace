@@ -10,7 +10,7 @@ public static class BookingEndpoints
     {
         app.MapGet("/api/bookings", () =>
         {
-            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
 
             var bookings = connection.Query<BookingDto>(
@@ -21,7 +21,7 @@ public static class BookingEndpoints
 
         app.MapGet("/api/bookings/{id:int}", (int id) =>
         {
-            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
             var booking = connection.QueryFirstOrDefault<BookingDto>(
                 "SELECT Id, RoomId, BookedBy, Title, StartTime, EndTime FROM dbo.Bookings WHERE Id = @Id;",
