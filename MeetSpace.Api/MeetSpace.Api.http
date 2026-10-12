@@ -53,3 +53,80 @@ Accept: application/json
 DELETE {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 
 ###
+
+### ===== Employees =====
+@employeeId = 1
+
+### Hämta alla medarbetare: 200
+GET {{MeetSpace.Api_HostAddress}}/api/employees
+Accept: application/json
+
+### Hämta en medarbetare: 200
+GET {{MeetSpace.Api_HostAddress}}/api/employees/{{employeeId}}
+Accept: application/json
+
+### Hämta medarbetare som inte finns: 404
+GET {{MeetSpace.Api_HostAddress}}/api/employees/999999
+Accept: application/json
+
+### Skapa medarbetare: 201
+POST {{MeetSpace.Api_HostAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "Anna Andersson",
+  "email": "anna@example.com"
+}
+
+### Skapa med e-post som redan finns: 409
+POST {{MeetSpace.Api_HostAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "Annan Anna",
+  "email": "anna@example.com"
+}
+
+### Skapa med ogiltiga fält: 400
+POST {{MeetSpace.Api_HostAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "inte-en-adress"
+}
+
+### Uppdatera medarbetare: 204
+PUT {{MeetSpace.Api_HostAddress}}/api/employees/{{employeeId}}
+Content-Type: application/json
+
+{
+  "name": "Anna Berg",
+  "email": "anna.berg@example.com"
+}
+
+### Uppdatera medarbetare som inte finns: 404
+PUT {{MeetSpace.Api_HostAddress}}/api/employees/999999
+Content-Type: application/json
+
+{
+  "name": "Anna Berg",
+  "email": "anna.berg@example.com"
+}
+
+### Uppdatera med ogiltig e-post: 400
+PUT {{MeetSpace.Api_HostAddress}}/api/employees/{{employeeId}}
+Content-Type: application/json
+
+{
+  "name": "Anna Berg",
+  "email": "anna@"
+}
+
+### Radera medarbetare: 204
+DELETE {{MeetSpace.Api_HostAddress}}/api/employees/{{employeeId}}
+
+### Radera medarbetare som inte finns: 404
+DELETE {{MeetSpace.Api_HostAddress}}/api/employees/999999
+
+###

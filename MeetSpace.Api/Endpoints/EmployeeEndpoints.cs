@@ -1,6 +1,6 @@
-using System.Net.Mail;
 using Dapper;
 using MeetSpace.Api.Dtos;
+using MeetSpace.Api.Validator;
 using Microsoft.Data.SqlClient;
 
 namespace MeetSpace.Api.Endpoints
@@ -34,7 +34,7 @@ namespace MeetSpace.Api.Endpoints
 
             app.MapPost("/api/employees", (CreateEmployeeDto request) =>
             {
-                var errors = Validate(request.Name, request.Email);
+                var errors = EmployeeValidator.Validate(request.Name, request.Email);
                 if (errors.Count > 0)
                 {
                     return Results.ValidationProblem(errors);
@@ -58,7 +58,7 @@ namespace MeetSpace.Api.Endpoints
 
             app.MapPut("/api/employees/{id:int}", (int id, UpdateEmployeeDto request) =>
             {
-                var errors = Validate(request.Name, request.Email);
+                var errors = EmployeeValidator.Validate(request.Name, request.Email);
                 if (errors.Count > 0)
                 {
                     return Results.ValidationProblem(errors);
@@ -96,33 +96,6 @@ namespace MeetSpace.Api.Endpoints
         private static SqlConnection CreateConnection(WebApplication app) =>
             new(app.Configuration.GetConnectionString("Prod")
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
-
-        private static Dictionary<string, string[]> Validate(string? name, string? email)
-        {
-            var errors = new Dictionary<string, string[]>();
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                errors["name"] = ["Fältet är obligatoriskt."];
-            }
-            else if (name.Length is < 2 or > 100 || name != name.Trim())
-            {
-                errors["name"] = ["Namnet måste vara 2–100 tecken utan inledande eller avslutande mellanslag."];
-            }
-
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                errors["email"] = ["Fältet är obligatoriskt."];
-            }
-            else if (email.Length > 254
-                || !MailAddress.TryCreate(email, out var address)
-                || address.Address != email)
-            {
-                errors["email"] = ["Fältet måste innehålla en giltig e-postadress med högst 254 tecken."];
-            }
-
-            return errors;
-        }
 
         // 2627 = unik constraint, 2601 = unikt index.
         private static bool IsUniqueViolation(SqlException ex) => ex.Number is 2627 or 2601;
