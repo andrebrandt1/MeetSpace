@@ -6,10 +6,6 @@ POST {{MeetSpace.Api_HostAddress}}/api/bookings
 Content-Type: application/json
 Accept: application/json
 
-### Get all rooms
-GET {{MeetSpace.Api_HostAddress}}/api/rooms
-Accept: application/json
-
 {
   "roomId": 1,
   "bookedBy": "John Doe",
@@ -18,9 +14,24 @@ Accept: application/json
   "endTime": "2026-10-15T10:00:00"
 }
 
+### Update booking: 204 No Content
+PUT {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
+Content-Type: application/json
+
+{
+  "roomId": 1,
+  "bookedBy": "John Doe",
+  "title": "Uppdaterat veckomöte",
+  "startTime": "2026-10-15T10:00:00",
+  "endTime": "2026-10-15T11:00:00"
+}
+
+### Get all rooms
+GET {{MeetSpace.Api_HostAddress}}/api/rooms
+Accept: application/json
+
 ###
 
-# Sätt bookingId till ett ID från GET /api/bookings. Förväntat: 200 OK.
 GET {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 Accept: application/json
 
@@ -34,8 +45,11 @@ Accept: application/json
 
 ### Get all bookings
 
-# Ett ID som inte finns. Förväntat: 404 Not Found.
 GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
 Accept: application/json
 
+###
 
+DELETE {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
+
+###

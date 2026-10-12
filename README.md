@@ -62,6 +62,20 @@ sparar bokningen, vilket hindrar samtidiga anrop från att dubbelboka samma rum.
 
 Ett färdigt anrop finns i [MeetSpace.Api.http](MeetSpace.Api/MeetSpace.Api.http).
 
+## Uppdatera bokning
+
+`PUT /api/bookings/{id}` använder `UpdateBookingDto` med samma sex fält och
+valideringsregler som vid skapande. Bokningens ID hämtas från URL:en.
+
+- `204 No Content`: bokningen har uppdaterats; svaret har ingen body.
+- `400 Bad Request`: valideringsfel eller ett mötesrum som inte finns.
+- `404 Not Found`: bokningen finns inte.
+- `409 Conflict`: tidsintervallet överlappar en annan bokning i det angivna rummet.
+
+Bokningen räknas inte som en konflikt med sig själv. Bokningar som gränsar till
+varandra tillåts. Validering sker före sparandet, och databasens kontroll av rum,
+överlapp och uppdatering sker i en transaktion. Vid fel lämnas bokningen oförändrad.
+
 ## Tester
 
 ```powershell
