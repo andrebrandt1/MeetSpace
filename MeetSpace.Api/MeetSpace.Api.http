@@ -1,6 +1,15 @@
-@MeetSpace.Api_HostAddress = http://localhost:8000
+@MeetSpace.Api_HostAddress = https://localhost:8000
 
-GET {{MeetSpace.Api_HostAddress}}/weatherforecast/
+POST {{MeetSpace.Api_HostAddress}}/api/bookings
+Content-Type: application/json
 Accept: application/json
+
+{
+  "roomId": 1,
+  "bookedBy": "John Doe",
+  "title": "Veckomöte",
+  "startTime": "2026-10-15T09:00:00",
+  "endTime": "2026-10-15T10:00:00"
+}
 
 ###

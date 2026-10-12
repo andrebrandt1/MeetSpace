@@ -1,4 +1,5 @@
 <Solution>
   <Folder Name="/Solution Items/" />
   <Project Path="MeetSpace.Api/MeetSpace.Api.csproj" />
+  <Project Path="MeetSpace.Api.Tests/MeetSpace.Api.Tests.csproj" />
 </Solution>

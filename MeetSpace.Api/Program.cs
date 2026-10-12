@@ -1,14 +1,14 @@
+using MeetSpace.Api.Bookings;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddScoped<IBookingRepository, SqlBookingRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
-
+app.MapBookingEndpoints();
 
 app.Run();
 
-
+public partial class Program;
