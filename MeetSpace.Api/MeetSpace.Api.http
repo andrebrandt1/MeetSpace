@@ -48,6 +48,38 @@ Accept: application/json
 GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
 Accept: application/json
 
+
+### Skapa ett mötesrum
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Konferensrum Himlen",
+  "description": "Stort konferensrum med utsikt över ett molntäckt landskap med harpspelande änglar.",
+  "capacity": 10,
+  "floor": 1000
+}
+
+### Testa flera valideringsfel
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Humlan",
+  "description": "Beskrivning med avslutande blanksteg ",
+  "capacity": 501,
+  "floor": 1001
+}
+
+### Skapa ett rum utan beskrivning
+POST {{MeetSpace.Api_HostAddress}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "Lilla mötesrummet",
+  "capacity": 4,
+  "floor": 0
+}
 ###
 
 DELETE {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}

@@ -19,9 +19,9 @@ public static class RoomEndpoints
 		{
 			using var connection =
 				new SqlConnection(
-					app.Configuration.GetConnectionString("Prod")
+					app.Configuration.GetConnectionString("DefaultConnection")
 					?? throw new InvalidOperationException(
-						"Anslutningssträngen 'Prod' saknas."));
+						"Anslutningssträngen 'DefaultConnection' saknas."));
 
 			var rooms =
 				connection.Query<Room>(
@@ -69,7 +69,27 @@ public static class RoomEndpoints
 			return Results.Ok(room);
 		});
 
-        app.MapDelete("/api/rooms/{id:int}", (int id) =>
+        app.MapPost("/api/rooms", async (
+           CreateRoomDto room,
+           RoomService service,
+           RoomValidationService validationService) =>
+        {
+            var errors = validationService.Validate(room);
+
+            if (errors.Count > 0)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            var createdRoom = await service.CreateRoom(room);
+
+            return Results.Created(
+                $"/api/rooms/{createdRoom.Id}",
+                createdRoom);
+        });
+
+
+        app.MapDelete("/api/booking/{id:int}", (int id) =>
         {
             using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
@@ -81,6 +101,38 @@ public static class RoomEndpoints
             return rows == 0 ? Results.NotFound() : Results.NoContent();
         });
 
-        return app;
+
+		// ============================================
+		// PUT - Uppdatera mötesrum
+		// ============================================
+
+		app.MapPut("/api/rooms/{id}", async (
+			int id,
+			UpdateRoomDto room,
+			RoomService roomService,
+			RoomValidationService validationService) =>
+		{
+			var errors =
+				validationService.Validate(room);
+
+			if (errors.Count > 0)
+			{
+				return Results.ValidationProblem(errors);
+			}
+
+			bool updated =
+				await roomService.UpdateRoomAsync(
+					id,
+					room);
+
+			if (!updated)
+			{
+				return Results.NotFound();
+			}
+
+			return Results.NoContent();
+		});
+		return app;
     }
+
 }

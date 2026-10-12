@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>7ad7e780-528d-418b-933a-1b8aeac6b725</UserSecretsId>
+    <UserSecretsId>booking-api-dev</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
