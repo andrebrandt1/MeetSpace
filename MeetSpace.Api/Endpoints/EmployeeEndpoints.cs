@@ -95,7 +95,7 @@ namespace MeetSpace.Api.Endpoints
 
         private static SqlConnection CreateConnection(WebApplication app) =>
             new(app.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+                ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
 
         // 2627 = unik constraint, 2601 = unikt index.
         private static bool IsUniqueViolation(SqlException ex) => ex.Number is 2627 or 2601;

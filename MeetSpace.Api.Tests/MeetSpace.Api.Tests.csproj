@@ -17,4 +17,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MeetSpace.ConsolApp\MeetSpace.ConsolApp.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -11,7 +11,7 @@ public static class BookingEndpoints
         app.MapGet("/api/bookings", () =>
         {
             using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+                ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
 
             var bookings = connection.Query<BookingDto>(
                 "SELECT Id, RoomId, BookedBy, Title, StartTime, EndTime FROM dbo.Bookings ORDER BY Id;").ToList();
@@ -22,7 +22,7 @@ public static class BookingEndpoints
         app.MapGet("/api/bookings/{id:int}", (int id) =>
         {
             using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+                ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
             var booking = connection.QueryFirstOrDefault<BookingDto>(
                 "SELECT Id, RoomId, BookedBy, Title, StartTime, EndTime FROM dbo.Bookings WHERE Id = @Id;",
                 new { Id = id });
@@ -35,8 +35,8 @@ public static class BookingEndpoints
 
         app.MapDelete("/api/bookings/{id:int}", (int id) =>
         {
-            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
-                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
 
             var rows = connection.Execute(
                 "DELETE FROM dbo.Bookings WHERE Id = @Id;",

@@ -4,16 +4,14 @@ Application for internal meetings
 
 ## Köra API:t
 
-API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngarna
-`ConnectionStrings:Prod` och `ConnectionStrings:DefaultConnection` ska peka på samma
-databas. I utvecklingsmiljön lagras de i projektets
+API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngen läses från
+`ConnectionStrings:DefaultConnection`. I utvecklingsmiljön lagras den i projektets
 User Secrets, inte i källkoden eller `appsettings.json`.
 
 Exempel för en lokal utvecklingsdatabas (byt server/databas vid behov):
 
 ```powershell
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
-dotnet user-secrets set "ConnectionStrings:Prod" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
 ```
 
 Kör [MeetSpace.sql](MeetSpace.Api/Data/MeetSpace.sql) i SQL Server för att skapa
@@ -114,6 +112,39 @@ valideringsregler som vid skapande. Bokningens ID hämtas från URL:en.
 Bokningen räknas inte som en konflikt med sig själv. Bokningar som gränsar till
 varandra tillåts. Validering sker före sparandet, och databasens kontroll av rum,
 överlapp och uppdatering sker i en transaktion. Vid fel lämnas bokningen oförändrad.
+
+## Medarbetare
+
+| Metod | Route | Svar |
+| --- | --- | --- |
+| `GET` | `/api/employees` | `200 OK` med alla medarbetare |
+| `GET` | `/api/employees/{id}` | `200 OK`, `404 Not Found` |
+| `POST` | `/api/employees` | `201 Created`, `400 Bad Request`, `409 Conflict` |
+| `PUT` | `/api/employees/{id}` | `204 No Content`, `400 Bad Request`, `404 Not Found`, `409 Conflict` |
+| `DELETE` | `/api/employees/{id}` | `204 No Content`, `404 Not Found` |
+
+`POST` använder `CreateEmployeeDto` och `PUT` använder `UpdateEmployeeDto`, båda med
+fälten `name` och `email`. Svaren använder `EmployeeDto`.
+
+```json
+{
+  "name": "Anna Andersson",
+  "email": "anna@example.com"
+}
+```
+
+Valideringen finns i `MeetSpace.Api/Validator/EmployeeValidator.cs`:
+
+- `name` är obligatoriskt, ska innehålla 2–100 tecken och får inte börja eller
+  sluta med whitespace.
+- `email` är obligatorisk, får innehålla högst 254 tecken och ska vara en giltig
+  e-postadress utan visningsnamn.
+- E-postadressen är unik i databasen. En adress som redan används av en annan
+  medarbetare ger `409 Conflict`. En medarbetare får behålla sin egen adress vid
+  uppdatering.
+
+Färdiga anrop för alla fall, även `400`, `404` och `409`, finns i
+[MeetSpace.Api.http](MeetSpace.Api/MeetSpace.Api.http).
 
 ## Tester
 

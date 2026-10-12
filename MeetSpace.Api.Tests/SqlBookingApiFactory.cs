@@ -13,7 +13,6 @@ public sealed class SqlBookingApiFactory(string connectionString) : WebApplicati
             new Dictionary<string, string?>
             {
                 ["ConnectionStrings:DefaultConnection"] = connectionString,
-                ["ConnectionStrings:Prod"] = connectionString
             }));
     }
 

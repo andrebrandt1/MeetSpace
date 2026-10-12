@@ -244,8 +244,6 @@ public sealed class EmployeeTests(SqlServerFixture database) : IClassFixture<Sql
     }
 }
 
-// Employee-endpoints läser anslutningssträngen "Prod". Program.cs saknar för närvarande
-// registreringen av IBookingRepository, vilket stoppar appstarten; den läggs bara till här.
 public sealed class EmployeeApiFactory(string connectionString) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -254,7 +252,6 @@ public sealed class EmployeeApiFactory(string connectionString) : WebApplication
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
             new Dictionary<string, string?>
             {
-                ["ConnectionStrings:Prod"] = connectionString,
                 ["ConnectionStrings:DefaultConnection"] = connectionString
             }));
         builder.ConfigureServices(services =>

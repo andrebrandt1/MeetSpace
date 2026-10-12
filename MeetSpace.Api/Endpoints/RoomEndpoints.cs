@@ -92,8 +92,8 @@ public static class RoomEndpoints
 
         app.MapDelete("/api/booking/{id:int}", (int id) =>
         {
-            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
-                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
 
             var rows = connection.Execute(
             "DELETE FROM dbo.Rooms WHERE Id = @Id;",
@@ -202,8 +202,8 @@ public static class RoomEndpoints
     }
 
     private static SqlConnection CreateConnection(IConfiguration configuration) => new(
-        configuration.GetConnectionString("Prod")
-        ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+        configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Anslutningssträngen 'DefaultConnection' saknas."));
 
     private static DynamicParameters Parameters(RoomRequestDto request)
     {
