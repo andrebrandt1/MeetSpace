@@ -14,10 +14,15 @@ public class RoomService
         _configuration = configuration;
     }
 
-    public async Task<RoomDto?> GetRoomByIdAsync(int id)
-    {
-        string connectionString =
-            _configuration.GetConnectionString("DefaultConnection")!;
+
+	// ============================================
+	// Hämta ett specifikt mötesrum
+	// ============================================
+
+	public async Task<RoomDto?> GetRoomByIdAsync(int id)
+	{
+		string connectionString =
+			_configuration.GetConnectionString("DefaultConnection")!;
 
         await using var connection =
             new SqlConnection(connectionString);
@@ -46,43 +51,111 @@ public class RoomService
             return null;
         }
 
-        return new RoomDto
-        {
-            Id = room.Id,
-            Name = room.Name,
-            Capacity = room.Capacity,
-            Floor = room.Floor,
-            Description = room.Description
-        };
-    }
+		return new RoomDto
+		{
+			Id = room.Id,
+			Name = room.Name,
+			Capacity = room.Capacity,
+			Floor = room.Floor,
+			Description = room.Description
+		};
+	}
 
 
-    public async Task<RoomDto> CreateRoom(CreateRoomDto room)
-    {
-        var connectionString =
-            _configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Anslutningssträngen 'DefaultConnection' saknas.");
+	// ============================================
+	// Skapa nytt mötesrum
+	// ============================================
 
-        await using var connection = new SqlConnection(connectionString);
+	public async Task<RoomDto> CreateRoom(
+		CreateRoomDto room)
+	{
+		string connectionString =
+			_configuration.GetConnectionString("DefaultConnection")!;
 
-        const string sql = """
-        INSERT INTO dbo.Rooms (Name, Description, Capacity, Floor)
-        OUTPUT INSERTED.Id,
-               INSERTED.Name,
-               INSERTED.Description,
-               INSERTED.Capacity,
-               INSERTED.Floor
-        VALUES (@Name, @Description, @Capacity, @Floor);
-        """;
+		await using var connection =
+			new SqlConnection(connectionString);
 
-        return await connection.QuerySingleAsync<RoomDto>(sql, new
-        {
-            room.Name,
-            room.Description,
-            room.Capacity,
-            room.Floor
-        });
-    }
+		string sql = """
+            INSERT INTO dbo.Rooms
+            (
+                Name,
+                Description,
+                Capacity,
+                Floor
+            )
+            OUTPUT
+                INSERTED.Id,
+                INSERTED.Name,
+                INSERTED.Description,
+                INSERTED.Capacity,
+                INSERTED.Floor
+            VALUES
+            (
+                @Name,
+                @Description,
+                @Capacity,
+                @Floor
+            );
+            """;
+
+		var createdRoom =
+			await connection.QuerySingleAsync<Room>(
+				sql,
+				new
+				{
+					Name = room.Name,
+					Description = room.Description,
+					Capacity = room.Capacity,
+					Floor = room.Floor
+				});
+
+		return new RoomDto
+		{
+			Id = createdRoom.Id,
+			Name = createdRoom.Name,
+			Description = createdRoom.Description,
+			Capacity = createdRoom.Capacity,
+			Floor = createdRoom.Floor
+		};
+	}
+
+
+	// ============================================
+	// Uppdatera mötesrum
+	// ============================================
+
+	public async Task<bool> UpdateRoomAsync(
+		int id,
+		UpdateRoomDto room)
+	{
+		string connectionString =
+			_configuration.GetConnectionString("DefaultConnection")!;
+
+		await using var connection =
+			new SqlConnection(connectionString);
+
+		string sql = """
+            UPDATE dbo.Rooms
+            SET
+                Name = @Name,
+                Description = @Description,
+                Capacity = @Capacity,
+                Floor = @Floor
+            WHERE Id = @Id;
+            """;
+
+		int rowsAffected =
+			await connection.ExecuteAsync(
+				sql,
+				new
+				{
+					Id = id,
+					Name = room.Name,
+					Description = room.Description,
+					Capacity = room.Capacity,
+					Floor = room.Floor
+				});
+
+		return rowsAffected > 0;
+	}
 }
-

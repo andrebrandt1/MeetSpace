@@ -19,9 +19,9 @@ public static class RoomEndpoints
 		{
 			using var connection =
 				new SqlConnection(
-					app.Configuration.GetConnectionString("Prod")
+					app.Configuration.GetConnectionString("DefaultConnection")
 					?? throw new InvalidOperationException(
-						"Anslutningssträngen 'Prod' saknas."));
+						"Anslutningssträngen 'DefaultConnection' saknas."));
 
 			var rooms =
 				connection.Query<Room>(
@@ -101,6 +101,38 @@ public static class RoomEndpoints
             return rows == 0 ? Results.NotFound() : Results.NoContent();
         });
 
-        return app;
+
+		// ============================================
+		// PUT - Uppdatera mötesrum
+		// ============================================
+
+		app.MapPut("/api/rooms/{id}", async (
+			int id,
+			UpdateRoomDto room,
+			RoomService roomService,
+			RoomValidationService validationService) =>
+		{
+			var errors =
+				validationService.Validate(room);
+
+			if (errors.Count > 0)
+			{
+				return Results.ValidationProblem(errors);
+			}
+
+			bool updated =
+				await roomService.UpdateRoomAsync(
+					id,
+					room);
+
+			if (!updated)
+			{
+				return Results.NotFound();
+			}
+
+			return Results.NoContent();
+		});
+		return app;
     }
+
 }
