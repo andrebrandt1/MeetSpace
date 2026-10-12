@@ -95,7 +95,7 @@ public static class RoomEndpoints
                 ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
 
             var rows = connection.Execute(
-            "DELETE FROM dbo.Bookings WHERE Id = @Id;",
+            "DELETE FROM dbo.Rooms WHERE Id = @Id;",
             new { Id = id });
 
             return rows == 0 ? Results.NotFound() : Results.NoContent();
