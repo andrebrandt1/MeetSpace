@@ -7,4 +7,9 @@
     <UserSecretsId>7ad7e780-528d-418b-933a-1b8aeac6b725</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.0" />
+  </ItemGroup>
+
 </Project>
