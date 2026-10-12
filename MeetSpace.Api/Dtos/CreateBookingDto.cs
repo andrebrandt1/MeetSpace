@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MeetSpace.Api.Bookings;
+namespace MeetSpace.Api.Dtos;
 
-public sealed class CreateBookingRequest
+public sealed class CreateBookingDto
 {
     public int? RoomId { get; init; }
     public string? BookedBy { get; init; }

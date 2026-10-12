@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using MeetSpace.Api.Bookings;
+using MeetSpace.Api.Dtos;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
@@ -34,7 +35,7 @@ public sealed class SqlBookingRepositoryTests(SqlServerFixture database) : IClas
         }, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var booking = await response.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
+        var booking = await response.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
         Assert.NotNull(booking);
         Assert.True(booking.Id > 0);
         await using var connection = new SqlConnection(database.ConnectionString);
@@ -44,9 +45,12 @@ public sealed class SqlBookingRepositoryTests(SqlServerFixture database) : IClas
             """, connection);
         await using var reader = await command.ExecuteReaderAsync(TestContext.Current.CancellationToken);
         Assert.True(await reader.ReadAsync(TestContext.Current.CancellationToken));
-        var persisted = new Booking(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2),
-            reader.GetString(3), reader.GetDateTime(4), reader.GetDateTime(5));
-        Assert.Equal(booking, persisted);
+        Assert.Equal(booking.Id, reader.GetInt32(0));
+        Assert.Equal(booking.RoomId, reader.GetInt32(1));
+        Assert.Equal(booking.BookedBy, reader.GetString(2));
+        Assert.Equal(booking.Title, reader.GetString(3));
+        Assert.Equal(booking.StartTime, reader.GetDateTime(4));
+        Assert.Equal(booking.EndTime, reader.GetDateTime(5));
         Assert.False(await reader.ReadAsync(TestContext.Current.CancellationToken));
     }
 

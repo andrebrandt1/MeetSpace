@@ -1,4 +1,5 @@
 using System.Data;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
 namespace MeetSpace.Api.Bookings;
@@ -19,51 +20,46 @@ public sealed class SqlBookingRepository(IConfiguration configuration) : IBookin
 
         // Keep the room locked until the overlap check and insert have completed.
         // This also protects a room that does not yet have any bookings.
-        await using var roomCommand = new SqlCommand(
+        var roomCommand = new CommandDefinition(
             "SELECT Id FROM dbo.Rooms WITH (UPDLOCK, HOLDLOCK) WHERE Id = @RoomId;",
-            connection, transaction);
-        roomCommand.Parameters.Add("@RoomId", SqlDbType.Int).Value = booking.RoomId;
+            new { booking.RoomId }, transaction, cancellationToken: cancellationToken);
 
-        if (await roomCommand.ExecuteScalarAsync(cancellationToken) is null)
+        if (await connection.QuerySingleOrDefaultAsync<int?>(roomCommand) is null)
         {
             await transaction.RollbackAsync(cancellationToken);
             return new CreateBookingResult(CreateBookingStatus.RoomNotFound);
         }
 
-        await using var overlapCommand = new SqlCommand("""
+        var parameters = new DynamicParameters();
+        parameters.Add("RoomId", booking.RoomId);
+        parameters.Add("StartTime", booking.StartTime, DbType.DateTime2);
+        parameters.Add("EndTime", booking.EndTime, DbType.DateTime2);
+
+        var overlapCommand = new CommandDefinition("""
             SELECT TOP (1) Id
             FROM dbo.Bookings
             WHERE RoomId = @RoomId AND StartTime < @EndTime AND EndTime > @StartTime;
-            """, connection, transaction);
-        AddTimeParameters(overlapCommand, booking);
+            """, parameters, transaction, cancellationToken: cancellationToken);
 
-        if (await overlapCommand.ExecuteScalarAsync(cancellationToken) is not null)
+        if (await connection.QuerySingleOrDefaultAsync<int?>(overlapCommand) is not null)
         {
             await transaction.RollbackAsync(cancellationToken);
             return new CreateBookingResult(CreateBookingStatus.Conflict);
         }
 
-        await using var insertCommand = new SqlCommand("""
-            INSERT INTO dbo.Bookings (RoomId, BookedBy, Title, StartTime, EndTime)
-            OUTPUT INSERTED.Id
-            VALUES (@RoomId, @BookedBy, @Title, @StartTime, @EndTime);
-            """, connection, transaction);
-        AddTimeParameters(insertCommand, booking);
-        insertCommand.Parameters.Add("@BookedBy", SqlDbType.NVarChar, 100).Value = booking.BookedBy;
-        insertCommand.Parameters.Add("@Title", SqlDbType.NVarChar, 100).Value = booking.Title;
+        parameters.Add("BookedBy", booking.BookedBy, DbType.String, size: 100);
+        parameters.Add("Title", booking.Title, DbType.String, size: 100);
 
-        var id = (int)(await insertCommand.ExecuteScalarAsync(cancellationToken))!;
+        var insertCommand = new CommandDefinition("""
+            INSERT INTO dbo.Bookings (RoomId, BookedBy, Title, StartTime, EndTime)
+            OUTPUT INSERTED.Id, INSERTED.RoomId, INSERTED.BookedBy, INSERTED.Title,
+                   INSERTED.StartTime, INSERTED.EndTime
+            VALUES (@RoomId, @BookedBy, @Title, @StartTime, @EndTime);
+            """, parameters, transaction, cancellationToken: cancellationToken);
+
+        var created = await connection.QuerySingleAsync<Booking>(insertCommand);
         await transaction.CommitAsync(cancellationToken);
 
-        return new CreateBookingResult(CreateBookingStatus.Created,
-            new Booking(id, booking.RoomId, booking.BookedBy, booking.Title,
-                booking.StartTime, booking.EndTime));
-    }
-
-    private static void AddTimeParameters(SqlCommand command, BookingToCreate booking)
-    {
-        command.Parameters.Add("@RoomId", SqlDbType.Int).Value = booking.RoomId;
-        command.Parameters.Add("@StartTime", SqlDbType.DateTime2).Value = booking.StartTime;
-        command.Parameters.Add("@EndTime", SqlDbType.DateTime2).Value = booking.EndTime;
+        return new CreateBookingResult(CreateBookingStatus.Created, created);
     }
 }

@@ -1,3 +1,5 @@
+using MeetSpace.Api.Dtos;
+
 namespace MeetSpace.Api.Bookings;
 
 public static class BookingEndpoints
@@ -9,7 +11,7 @@ public static class BookingEndpoints
     }
 
     private static async Task<IResult> CreateAsync(
-        CreateBookingRequest request,
+        CreateBookingDto request,
         IBookingRepository repository,
         CancellationToken cancellationToken)
     {
@@ -24,8 +26,7 @@ public static class BookingEndpoints
 
         return result.Status switch
         {
-            CreateBookingStatus.Created => Results.Created(
-                $"/api/bookings/{result.Booking!.Id}", result.Booking),
+            CreateBookingStatus.Created => CreatedResponse(result.Booking!),
             CreateBookingStatus.RoomNotFound => Results.ValidationProblem(
                 new Dictionary<string, string[]>
                 {
@@ -36,5 +37,20 @@ public static class BookingEndpoints
                 title: "Bokningen överlappar en befintlig bokning för samma mötesrum."),
             _ => throw new InvalidOperationException("Okänt resultat när bokningen skapades.")
         };
+    }
+
+    private static IResult CreatedResponse(Booking booking)
+    {
+        var bookingDto = new BookingDto
+        {
+            Id = booking.Id,
+            RoomId = booking.RoomId,
+            BookedBy = booking.BookedBy,
+            Title = booking.Title,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime
+        };
+
+        return Results.Created($"/api/bookings/{bookingDto.Id}", bookingDto);
     }
 }

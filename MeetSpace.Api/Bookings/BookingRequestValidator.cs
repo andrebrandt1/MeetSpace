@@ -1,4 +1,5 @@
 using System.Globalization;
+using MeetSpace.Api.Dtos;
 
 namespace MeetSpace.Api.Bookings;
 
@@ -12,7 +13,7 @@ public static class BookingRequestValidator
     ];
 
     public static Dictionary<string, string[]> Validate(
-        CreateBookingRequest request, out BookingToCreate? booking)
+        CreateBookingDto request, out BookingToCreate? booking)
     {
         var errors = new Dictionary<string, string[]>();
 

@@ -4,7 +4,7 @@ Application for internal meetings
 
 ## Köra API:t
 
-API:t använder .NET 10 och SQL Server. Anslutningssträngen läses från
+API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngen läses från
 `ConnectionStrings:DefaultConnection`. I utvecklingsmiljön lagras den i projektets
 User Secrets, inte i källkoden eller `appsettings.json`.
 
@@ -31,6 +31,9 @@ dotnet run --project MeetSpace.Api --launch-profile https
 ## Skapa bokning
 
 `POST /api/bookings` med `Content-Type: application/json`:
+
+Requesten använder `CreateBookingDto` och svaret använder `BookingDto` i
+`MeetSpace.Api/Dtos`. Endpointen mappar den sparade bokningen till svars-DTO:n.
 
 ```json
 {

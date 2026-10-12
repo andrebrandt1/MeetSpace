@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using MeetSpace.Api.Bookings;
+using MeetSpace.Api.Dtos;
 
 namespace MeetSpace.Api.Tests;
 
@@ -17,7 +17,7 @@ public sealed class CreateBookingTests
         using var response = await client.PostAsJsonAsync("/api/bookings", ValidRequest(), TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var booking = await response.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
+        var booking = await response.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
         Assert.NotNull(booking);
         Assert.True(booking.Id > 0);
         Assert.Equal(1, booking.RoomId);
@@ -92,7 +92,7 @@ public sealed class CreateBookingTests
         using var response = await client.PostAsJsonAsync("/api/bookings", request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var booking = await response.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
+        var booking = await response.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
         Assert.Equal("John  Doe", booking!.BookedBy);
         Assert.Equal("Vecko\tmöte", booking.Title);
     }
@@ -203,8 +203,8 @@ public sealed class CreateBookingTests
         using var response = await client.PostAsJsonAsync("/api/bookings", request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var firstBooking = await first.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
-        var secondBooking = await response.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
+        var firstBooking = await first.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
+        var secondBooking = await response.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
         Assert.NotEqual(firstBooking!.Id, secondBooking!.Id);
         Assert.Equal(2, factory.Repository.Bookings.Count);
     }
@@ -254,7 +254,7 @@ public sealed class CreateBookingTests
         using var response = await client.PostAsJsonAsync("/api/bookings", request, TestContext.Current.CancellationToken);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var booking = await response.Content.ReadFromJsonAsync<Booking>(TestContext.Current.CancellationToken);
+        var booking = await response.Content.ReadFromJsonAsync<BookingDto>(TestContext.Current.CancellationToken);
         Assert.Equal(new DateTime(2026, 10, 15, 9, 0, 0).AddTicks(1234567), booking!.StartTime);
     }
 
