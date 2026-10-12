@@ -10,7 +10,11 @@ public sealed class SqlBookingApiFactory(string connectionString) : WebApplicati
     {
         builder.UseEnvironment("Testing");
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
-            new Dictionary<string, string?> { ["ConnectionStrings:DefaultConnection"] = connectionString }));
+            new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:DefaultConnection"] = connectionString,
+                ["ConnectionStrings:Prod"] = connectionString
+            }));
     }
 
     public HttpClient CreateApiClient() => CreateClient(new WebApplicationFactoryClientOptions
