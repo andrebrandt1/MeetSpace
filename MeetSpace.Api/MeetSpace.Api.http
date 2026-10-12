@@ -85,3 +85,16 @@ Content-Type: application/json
 DELETE {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 
 ###
+
+
+### Uppdatera mötesrum
+
+PUT {{MeetSpace.Api_HostAddress}}/api/rooms/1000
+Content-Type: application/json
+
+{
+  "name": "Konferensrum Himlen",
+  "description": "Stort konferensrum med utsikt över ett molntäckt landskap med harpspelande änglar.",
+  "capacity": 10,
+  "floor": 1000
+}
