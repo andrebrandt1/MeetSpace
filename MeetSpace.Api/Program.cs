@@ -1,6 +1,8 @@
 using MeetSpace.Api.Endpoints;
 using MeetSpace.Api.Services;
 
+using MeetSpace.Api.Bookings;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Register a room service
@@ -12,6 +14,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.MapRoomEndpoints();
-app.MapBookingListEndpoints();
+app.MapBookingEndpoints();
 
 app.Run();

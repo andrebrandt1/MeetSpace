@@ -1,6 +1,6 @@
 namespace MeetSpace.Api.Dtos;
 
-public record BookingListDto
+public record BookingDto
 {
     public int Id { get; set; }
     public int RoomId { get; set; }
