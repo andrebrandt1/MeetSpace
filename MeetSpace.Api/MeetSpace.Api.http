@@ -1,11 +1,20 @@
 @MeetSpace.Api_HostAddress = https://localhost:8000
 
+### Get all rooms
+
 GET {{MeetSpace.Api_HostAddress}}/api/rooms
 Accept: application/json
 
-###
+
+
+### Get specific room
+
+GET {{MeetSpace.Api_HostAddress}}/api/rooms/100
+Accept: application/json
+
+### Get all bookings
 
 GET {{MeetSpace.Api_HostAddress}}/api/bookings
 Accept: application/json
 
-###
+
