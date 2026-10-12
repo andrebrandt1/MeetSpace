@@ -4,13 +4,15 @@ Application for internal meetings
 
 ## Köra API:t
 
-API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngen läses från
-`ConnectionStrings:Prod`. I utvecklingsmiljön lagras den i projektets
+API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngarna
+`ConnectionStrings:Prod` och `ConnectionStrings:DefaultConnection` ska peka på samma
+databas. I utvecklingsmiljön lagras de i projektets
 User Secrets, inte i källkoden eller `appsettings.json`.
 
 Exempel för en lokal utvecklingsdatabas (byt server/databas vid behov):
 
 ```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
 dotnet user-secrets set "ConnectionStrings:Prod" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
 ```
 
@@ -27,6 +29,43 @@ Starta API:t i Development-miljön, där User Secrets laddas automatiskt:
 ```powershell
 dotnet run --project MeetSpace.Api --launch-profile https
 ```
+
+## Konsolappen
+
+Starta API:t och konsolappen i varsin terminal:
+
+```powershell
+dotnet run --project MeetSpace.Api --launch-profile http
+dotnet run --project MeetSpace.ConsolApp
+```
+
+Konsolappen visar en animerad regnbågsrubrik och följande menyer:
+
+| Huvudmeny | Funktioner |
+| --- | --- |
+| 1. Rum | Hämta alla rum, hämta enskilt rum |
+| 2. Mötesrum | Skapa, uppdatera och radera mötesrum |
+| 3. Bokning | Skapa, hämta alla, hämta enskild, uppdatera och radera bokning |
+
+Använd siffror eller piltangenter och Enter. `0` eller Esc går tillbaka.
+Skriv `:avbryt` i ett formulär för att avbryta. Vid uppdatering behåller Enter
+nuvarande värde, och `-` tömmer rummets beskrivning. Radering bekräftas med `j`.
+Datum anges exempelvis som `2026-10-15 09:00`.
+
+Standardadressen är `http://localhost:9000`. En annan server kan anges med
+`MEETSPACE_API_URL` eller kommandoradsargumentet:
+
+```powershell
+dotnet run --project MeetSpace.ConsolApp -- --api-url https://localhost:8000
+dotnet run --project MeetSpace.ConsolApp -- --no-animation
+```
+
+Animationen körs i en interaktiv terminal. Vid omdirigerad in- eller utmatning
+används en vanlig textmeny. `--help` visar samtliga funktioner och startalternativ.
+
+Mötesrum har namn (1–50 tecken), valfri beskrivning (högst 1000 tecken), kapacitet
+(minst 1) och våning (heltal, även negativa våningar). Ett rum med bokningar kan
+inte raderas förrän bokningarna har raderats.
 
 ## Skapa bokning
 
@@ -83,6 +122,8 @@ dotnet test --solution MeetSpace.slnx
 ```
 
 HTTP-testerna kontrollerar validering, statuskoder och tidsgränser.
+Konsolklientens API-anrop för samtliga rum- och bokningsfunktioner testas också,
+inklusive felmeddelanden och skydd mot att radera rum som har bokningar.
 SQL-testerna kontrollerar dessutom sparade data och samtidiga HTTP-anrop mot
 den riktiga SQL-implementationen. På Windows används SQL Server LocalDB.
 För en annan SQL Server kan `MEETSPACE_TEST_SQLSERVER` anges som anslutningssträng
