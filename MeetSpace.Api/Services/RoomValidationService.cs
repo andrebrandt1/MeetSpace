@@ -1,4 +1,4 @@
-﻿using MeetSpace.Api.Dto;
+﻿using MeetSpace.Api.Dtos;
 
 namespace MeetSpace.Api.Services;
 

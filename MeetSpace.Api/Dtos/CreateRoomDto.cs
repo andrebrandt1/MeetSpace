@@ -1,4 +1,4 @@
-﻿namespace MeetSpace.Api.Dto
+﻿namespace MeetSpace.Api.Dtos
 {
     public class CreateRoomDto
     {

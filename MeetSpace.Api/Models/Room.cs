@@ -1,6 +1,6 @@
-﻿namespace MeetSpace.Api.Dto;
+namespace MeetSpace.Api.Models;
 
-public class RoomDto
+public class Room
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;

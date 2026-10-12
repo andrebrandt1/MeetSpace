@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using MeetSpace.Api.Dto;
+using MeetSpace.Api.Dtos;
 using Microsoft.Data.SqlClient;
 
 namespace MeetSpace.Api.Services;

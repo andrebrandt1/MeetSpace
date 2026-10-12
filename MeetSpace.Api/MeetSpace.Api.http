@@ -1,9 +1,36 @@
 @MeetSpace.Api_HostAddress = https://localhost:8000
+@bookingId = 1
 
-GET {{MeetSpace.Api_HostAddress}}/weatherforecast/
+### Create booking
+POST {{MeetSpace.Api_HostAddress}}/api/bookings
+Content-Type: application/json
+Accept: application/json
+
+### Get all rooms
+GET {{MeetSpace.Api_HostAddress}}/api/rooms
+Accept: application/json
+
+{
+  "roomId": 1,
+  "bookedBy": "John Doe",
+  "title": "Veckomöte",
+  "startTime": "2026-10-15T09:00:00",
+  "endTime": "2026-10-15T10:00:00"
+}
+
+###
+
+# Sätt bookingId till ett ID från GET /api/bookings. Förväntat: 200 OK.
+GET {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 Accept: application/json
 
 ###
+
+# Ett ID som inte finns. Förväntat: 404 Not Found.
+GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
+Accept: application/json
+
+
 ### Skapa ett mötesrum
 POST {{MeetSpace.Api_HostAddress}}/api/rooms
 Content-Type: application/json
@@ -20,7 +47,7 @@ POST {{MeetSpace.Api_HostAddress}}/api/rooms
 Content-Type: application/json
 
 {
-  "name": " A",
+  "name": "Humlan",
   "description": "Beskrivning med avslutande blanksteg ",
   "capacity": 501,
   "floor": 1001
