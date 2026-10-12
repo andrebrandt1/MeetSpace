@@ -1,41 +1,58 @@
 ﻿using Dapper;
 using MeetSpace.Api.Dtos;
+using MeetSpace.Api.Models;
 using Microsoft.Data.SqlClient;
 
 namespace MeetSpace.Api.Services;
 
 public class RoomService
 {
-    private readonly string _connectionString;
+	private readonly IConfiguration _configuration;
 
-    public RoomService(IConfiguration configuration)
-    {
-        _connectionString =
-            configuration.GetConnectionString("MeetSpace")
-            ?? throw new InvalidOperationException(
-                "Connection string 'MeetSpace' saknas.");
-    }
+	public RoomService(IConfiguration configuration)
+	{
+		_configuration = configuration;
+	}
 
-    public async Task<RoomDto> CreateRoom(CreateRoomDto room)
-    {
-        using var connection = new SqlConnection(_connectionString);
+	public async Task<RoomDto?> GetRoomByIdAsync(int id)
+	{
+		string connectionString =
+			_configuration.GetConnectionString("DefaultConnection")!;
 
-        const string sql = """
-            INSERT INTO dbo.Rooms (Name, Description, Capacity, Floor)
-            OUTPUT INSERTED.Id,
-                   INSERTED.Name,
-                   INSERTED.Description,
-                   INSERTED.Capacity,
-                   INSERTED.Floor
-            VALUES (@Name, @Description, @Capacity, @Floor);
+		await using var connection =
+			new SqlConnection(connectionString);
+
+		string sql = """
+            SELECT
+                Id,
+                Name,
+                Capacity,
+                Floor,
+                Description
+            FROM dbo.Rooms
+            WHERE Id = @Id;
             """;
 
-        return await connection.QuerySingleAsync<RoomDto>(sql, new
-        {
-            room.Name,
-            room.Description,
-            room.Capacity,
-            room.Floor
-        });
-    }
+		var room =
+			await connection.QuerySingleOrDefaultAsync<Room>(
+				sql,
+				new
+				{
+					Id = id
+				});
+
+		if (room is null)
+		{
+			return null;
+		}
+
+		return new RoomDto
+		{
+			Id = room.Id,
+			Name = room.Name,
+			Capacity = room.Capacity,
+			Floor = room.Floor,
+			Description = room.Description
+		};
+	}
 }
