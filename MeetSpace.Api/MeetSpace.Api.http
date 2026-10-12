@@ -1,6 +1,6 @@
-@MeetSpace.Api_HostAddress = http://localhost:8000
+@MeetSpace_Api_HostAddress = https://localhost:8000
 
-GET {{MeetSpace.Api_HostAddress}}/weatherforecast/
+### Hämta ett specifikt mötesrum
+
+GET {{MeetSpace_Api_HostAddress}}/api/rooms/1000
 Accept: application/json
-
-###
