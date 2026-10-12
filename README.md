@@ -5,21 +5,21 @@ Application for internal meetings
 ## Köra API:t
 
 API:t använder .NET 10, Dapper och SQL Server. Anslutningssträngen läses från
-`ConnectionStrings:DefaultConnection`. I utvecklingsmiljön lagras den i projektets
+`ConnectionStrings:Prod`. I utvecklingsmiljön lagras den i projektets
 User Secrets, inte i källkoden eller `appsettings.json`.
 
 Exempel för en lokal utvecklingsdatabas (byt server/databas vid behov):
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
+dotnet user-secrets set "ConnectionStrings:Prod" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
 ```
 
-Skapa databasen `MeetSpace` i SQL Server och kör
-[schema.sql](MeetSpace.Api/Database/schema.sql) en gång i den nya databasen.
+Kör [MeetSpace.sql](MeetSpace.Api/Data/MeetSpace.sql) i SQL Server för att skapa
+databasen och tabellerna. SQL-testerna använder samma tabell-definitioner.
 Lägg därefter till de mötesrum som ska gå att boka, exempelvis:
 
 ```sql
-INSERT INTO dbo.Rooms (Name) VALUES (N'Mötesrum 1');
+INSERT INTO dbo.Rooms (Name, Capacity, Floor) VALUES (N'Mötesrum 1', 10, 1);
 ```
 
 Starta API:t i Development-miljön, där User Secrets laddas automatiskt:

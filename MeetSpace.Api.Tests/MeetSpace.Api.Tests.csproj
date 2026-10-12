@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
     <PackageReference Include="xunit.v3" Version="4.0.1" />
     <ProjectReference Include="../MeetSpace.Api/MeetSpace.Api.csproj" />
-    <None Include="../MeetSpace.Api/Database/schema.sql" Link="schema.sql" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../MeetSpace.Api/Data/MeetSpace.sql" Link="MeetSpace.sql" CopyToOutputDirectory="PreserveNewest" />
     <Using Include="Xunit" />
   </ItemGroup>
 

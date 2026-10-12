@@ -1,5 +1,6 @@
 using MeetSpace.Api.Bookings;
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace MeetSpace.Api.Tests;
 
@@ -55,12 +56,27 @@ public sealed class SqlServerFixture : IAsyncLifetime
         {
             await using var connection = new SqlConnection(ConnectionString);
             await connection.OpenAsync();
-            var schema = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "schema.sql"));
-            await using var initialize = new SqlCommand(schema + """
+            var script = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "MeetSpace.sql"));
+            const string schemaMarker = "-- Tabellen nedan används också av testerna i deras tillfälliga databas.";
+            var schemaStart = script.IndexOf(schemaMarker, StringComparison.Ordinal);
+            if (schemaStart < 0)
+            {
+                throw new InvalidOperationException("Schemasnittet saknas i MeetSpace.sql.");
+            }
 
-                INSERT INTO dbo.Rooms (Name) VALUES (N'Rum 1'), (N'Rum 2');
+            var schema = script[(schemaStart + schemaMarker.Length)..];
+            foreach (var batch in Regex.Split(schema, @"(?im)^\s*GO\s*$"))
+            {
+                if (string.IsNullOrWhiteSpace(batch)) continue;
+                await using var initialize = new SqlCommand(batch, connection);
+                await initialize.ExecuteNonQueryAsync();
+            }
+
+            await using var seed = new SqlCommand("""
+                INSERT INTO dbo.Rooms (Name, Capacity, Floor)
+                VALUES (N'Rum 1', 10, 1), (N'Rum 2', 10, 2);
                 """, connection);
-            await initialize.ExecuteNonQueryAsync();
+            await seed.ExecuteNonQueryAsync();
         }
         catch
         {
