@@ -7,6 +7,7 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.MapRoomEndpoints();
+app.MapBookingListEndpoints();
 
 app.Run();
 

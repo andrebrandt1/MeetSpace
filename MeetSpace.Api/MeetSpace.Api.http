@@ -4,3 +4,8 @@ GET {{MeetSpace.Api_HostAddress}}/api/rooms
 Accept: application/json
 
 ###
+
+GET {{MeetSpace.Api_HostAddress}}/api/bookings
+Accept: application/json
+
+###
