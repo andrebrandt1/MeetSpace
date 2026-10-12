@@ -33,7 +33,7 @@ public sealed class TestBookingRepository : IBookingRepository
     public int Calls { get; private set; }
 
     public Task<CreateBookingResult> CreateAsync(
-        BookingToCreate booking, CancellationToken cancellationToken)
+        BookingDetails booking, CancellationToken cancellationToken)
     {
         Calls++;
 
@@ -52,5 +52,32 @@ public sealed class TestBookingRepository : IBookingRepository
             booking.Title, booking.StartTime, booking.EndTime);
         Bookings.Add(created);
         return Task.FromResult(new CreateBookingResult(CreateBookingStatus.Created, created));
+    }
+
+    public Task<UpdateBookingStatus> UpdateAsync(
+        int id, BookingDetails booking, CancellationToken cancellationToken)
+    {
+        Calls++;
+        var index = Bookings.FindIndex(existing => existing.Id == id);
+
+        if (index < 0)
+        {
+            return Task.FromResult(UpdateBookingStatus.BookingNotFound);
+        }
+
+        if (booking.RoomId is not (1 or 2))
+        {
+            return Task.FromResult(UpdateBookingStatus.RoomNotFound);
+        }
+
+        if (Bookings.Any(existing => existing.Id != id && existing.RoomId == booking.RoomId
+            && existing.StartTime < booking.EndTime && existing.EndTime > booking.StartTime))
+        {
+            return Task.FromResult(UpdateBookingStatus.Conflict);
+        }
+
+        Bookings[index] = new Booking(id, booking.RoomId, booking.BookedBy,
+            booking.Title, booking.StartTime, booking.EndTime);
+        return Task.FromResult(UpdateBookingStatus.Updated);
     }
 }

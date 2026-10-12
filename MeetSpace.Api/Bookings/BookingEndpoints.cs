@@ -4,9 +4,10 @@ namespace MeetSpace.Api.Bookings;
 
 public static class BookingEndpoints
 {
-    public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder endpoints)
+    public static IEndpointRouteBuilder MapBookingWriteEndpoints(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapPost("/api/bookings", CreateAsync);
+        endpoints.MapPut("/api/bookings/{id:int}", UpdateAsync);
         return endpoints;
     }
 
@@ -36,6 +37,37 @@ public static class BookingEndpoints
                 statusCode: StatusCodes.Status409Conflict,
                 title: "Bokningen överlappar en befintlig bokning för samma mötesrum."),
             _ => throw new InvalidOperationException("Okänt resultat när bokningen skapades.")
+        };
+    }
+
+    private static async Task<IResult> UpdateAsync(
+        int id,
+        UpdateBookingDto request,
+        IBookingRepository repository,
+        CancellationToken cancellationToken)
+    {
+        var errors = BookingRequestValidator.Validate(request, out var booking);
+
+        if (errors.Count > 0)
+        {
+            return Results.ValidationProblem(errors);
+        }
+
+        var status = await repository.UpdateAsync(id, booking!, cancellationToken);
+
+        return status switch
+        {
+            UpdateBookingStatus.Updated => Results.NoContent(),
+            UpdateBookingStatus.BookingNotFound => Results.NotFound(),
+            UpdateBookingStatus.RoomNotFound => Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["roomId"] = ["Det angivna mötesrummet finns inte."]
+                }),
+            UpdateBookingStatus.Conflict => Results.Problem(
+                statusCode: StatusCodes.Status409Conflict,
+                title: "Bokningen överlappar en befintlig bokning för samma mötesrum."),
+            _ => throw new InvalidOperationException("Okänt resultat när bokningen uppdaterades.")
         };
     }
 

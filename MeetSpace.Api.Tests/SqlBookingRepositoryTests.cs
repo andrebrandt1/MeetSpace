@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using MeetSpace.Api.Bookings;
 using MeetSpace.Api.Dtos;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -162,16 +161,6 @@ public sealed class SqlBookingRepositoryTests(SqlServerFixture database) : IClas
             ["ConnectionStrings:DefaultConnection"] = database.ConnectionString
         }).Build());
 
-    private static BookingToCreate NewBooking() => new(1, "John Doe", "Veckomöte",
+    private static BookingDetails NewBooking() => new(1, "John Doe", "Veckomöte",
         new DateTime(2026, 10, 15, 9, 0, 0), new DateTime(2026, 10, 15, 10, 0, 0));
-
-    private sealed class SqlBookingApiFactory(string connectionString) : WebApplicationFactory<Program>
-    {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.UseEnvironment("Testing");
-            builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(
-                new Dictionary<string, string?> { ["ConnectionStrings:DefaultConnection"] = connectionString }));
-        }
-    }
 }

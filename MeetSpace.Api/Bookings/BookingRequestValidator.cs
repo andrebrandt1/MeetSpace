@@ -13,7 +13,7 @@ public static class BookingRequestValidator
     ];
 
     public static Dictionary<string, string[]> Validate(
-        CreateBookingDto request, out BookingToCreate? booking)
+        BookingRequestDto request, out BookingDetails? booking)
     {
         var errors = new Dictionary<string, string[]>();
 
@@ -32,14 +32,15 @@ public static class BookingRequestValidator
             errors["endTime"] = ["Sluttiden måste vara senare än starttiden."];
         }
 
-        if (request.AdditionalProperties?.Keys.Any(
-            key => string.Equals(key, "id", StringComparison.OrdinalIgnoreCase)) == true)
+        if (request is CreateBookingDto createRequest
+            && createRequest.AdditionalProperties?.Keys.Any(
+                key => string.Equals(key, "id", StringComparison.OrdinalIgnoreCase)) == true)
         {
             errors["id"] = ["Bokningens ID genereras automatiskt och får inte anges."];
         }
 
         booking = errors.Count == 0
-            ? new BookingToCreate(request.RoomId!.Value, request.BookedBy!, request.Title!,
+            ? new BookingDetails(request.RoomId!.Value, request.BookedBy!, request.Title!,
                 startTime!.Value, endTime!.Value)
             : null;
 
