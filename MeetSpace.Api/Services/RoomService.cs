@@ -7,12 +7,12 @@ namespace MeetSpace.Api.Services;
 
 public class RoomService
 {
-	private readonly IConfiguration _configuration;
+    private readonly IConfiguration _configuration;
 
-	public RoomService(IConfiguration configuration)
-	{
-		_configuration = configuration;
-	}
+    public RoomService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
 
 
 	// ============================================
@@ -24,10 +24,10 @@ public class RoomService
 		string connectionString =
 			_configuration.GetConnectionString("DefaultConnection")!;
 
-		await using var connection =
-			new SqlConnection(connectionString);
+        await using var connection =
+            new SqlConnection(connectionString);
 
-		string sql = """
+        string sql = """
             SELECT
                 Id,
                 Name,
@@ -38,18 +38,18 @@ public class RoomService
             WHERE Id = @Id;
             """;
 
-		var room =
-			await connection.QuerySingleOrDefaultAsync<Room>(
-				sql,
-				new
-				{
-					Id = id
-				});
+        var room =
+            await connection.QuerySingleOrDefaultAsync<Room>(
+                sql,
+                new
+                {
+                    Id = id
+                });
 
-		if (room is null)
-		{
-			return null;
-		}
+        if (room is null)
+        {
+            return null;
+        }
 
 		return new RoomDto
 		{
