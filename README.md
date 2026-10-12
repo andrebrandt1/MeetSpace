@@ -16,12 +16,12 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=(localdb)\
 dotnet user-secrets set "ConnectionStrings:Prod" "Server=(localdb)\MSSQLLocalDB;Database=MeetSpace;Integrated Security=true;Encrypt=false" --project MeetSpace.Api
 ```
 
-Skapa databasen `MeetSpace` i SQL Server och kör
-[schema.sql](MeetSpace.Api/Database/schema.sql) en gång i den nya databasen.
+Kör [MeetSpace.sql](MeetSpace.Api/Data/MeetSpace.sql) i SQL Server för att skapa
+databasen och tabellerna. SQL-testerna använder samma tabell-definitioner.
 Lägg därefter till de mötesrum som ska gå att boka, exempelvis:
 
 ```sql
-INSERT INTO dbo.Rooms (Name, Capacity, Floor) VALUES (N'Mötesrum 1', 8, 0);
+INSERT INTO dbo.Rooms (Name, Capacity, Floor) VALUES (N'Mötesrum 1', 10, 1);
 ```
 
 Starta API:t i Development-miljön, där User Secrets laddas automatiskt:
