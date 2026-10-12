@@ -29,6 +29,18 @@ public static class RoomEndpoints
             return Results.Ok(roomDtos);
         });
 
+        app.MapDelete("/api/booking/{id:int}", (int id) =>
+        {
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+
+            var rows = connection.Execute(
+            "DELETE FROM dbo.Bookings WHERE Id = @Id;",
+            new { Id = id });
+
+            return rows == 0 ? Results.NotFound() : Results.NoContent();
+        });
+
         return app;
     }
 }
