@@ -20,14 +20,16 @@ Accept: application/json
 
 ###
 
-# Sätt bookingId till ett ID från GET /api/bookings. Förväntat: 200 OK.
 GET {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 Accept: application/json
 
 ###
 
-# Ett ID som inte finns. Förväntat: 404 Not Found.
 GET {{MeetSpace.Api_HostAddress}}/api/bookings/0
 Accept: application/json
+
+###
+
+DELETE {{MeetSpace.Api_HostAddress}}/api/bookings/{{bookingId}}
 
 ###
